@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>إدارة إيجار التراكي - مارينا طرقي</title>
+<style>
+:root{--navy:#0a1628;--sea:#1a3a5c;--teal:#0e7490;--aqua:#06b6d4;--gold:#f59e0b;--red:#ef4444;--green:#10b981;--white:#f8fafc;--gray:#64748b;--light:#e2e8f0;--card:#132238}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--navy);color:var(--white);font-family:'Segoe UI',Tahoma,Arial,sans-serif;min-height:100vh}
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1.5rem}
+.login-card{background:var(--card);border:1px solid var(--teal);border-radius:20px;padding:2rem;width:100%;max-width:400px;text-align:center}
+.login-title{font-size:1.3rem;color:var(--aqua);font-weight:700;margin-bottom:.5rem}
+.login-sub{color:var(--gray);font-size:.8rem;margin-bottom:1.5rem}
+input{width:100%;background:rgba(255,255,255,.07);border:1.5px solid var(--sea);border-radius:10px;color:var(--white);padding:.8rem 1rem;font-size:1rem;outline:none;direction:rtl}
+input:focus{border-color:var(--aqua)}
+.btn{width:100%;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:.9rem;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem}
+.btn-danger{background:var(--red)}
+.btn-success{background:var(--green)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-sm{padding:.4rem 1rem;font-size:.8rem;width:auto}
+label{display:block;text-align:right;margin-bottom:.3rem;font-size:.85rem;color:var(--light)}
+.form-group{margin-bottom:1rem}
+.error-msg{color:var(--red);font-size:.8rem;margin-top:.5rem}
+#app{display:none}
+.topbar{background:var(--sea);padding:.8rem 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-title{font-size:1rem;font-weight:700;color:var(--aqua)}
+.topbar-user{font-size:.7rem;color:var(--gray)}
+.logout-btn{background:none;border:1px solid var(--gray);color:var(--gray);border-radius:6px;padding:.2rem .6rem;font-size:.7rem;cursor:pointer}
+.nav-tabs{display:flex;background:var(--sea);overflow-x:auto;gap:.5rem;padding:.5rem}
+.nav-tab{padding:.5rem .8rem;font-size:.8rem;cursor:pointer;color:var(--gray);border-radius:20px;white-space:nowrap}
+.nav-tab.active{background:var(--teal);color:#fff}
+.section{display:none;padding:1rem}
+.section.active{display:block}
+.card{background:var(--card);border-radius:12px;padding:1rem;margin-bottom:1rem;border:1px solid rgba(14,116,144,.2)}
+.card-title{font-size:.9rem;font-weight:700;color:var(--aqua);margin-bottom:.6rem}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+.stat-card{background:var(--card);border-radius:12px;padding:.8rem;text-align:center;border:1px solid rgba(14,116,144,.2)}
+.stat-label{font-size:.7rem;color:var(--gray);margin-bottom:.2rem}
+.stat-val{font-size:1.1rem;font-weight:800}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.75rem}
+th,td{padding:.5rem;text-align:right;border-bottom:1px solid rgba(255,255,255,.05)}
+th{color:var(--aqua)}
+.badge{display:inline-block;padding:.2rem .5rem;border-radius:20px;font-size:.65rem;font-weight:700}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-gold{background:rgba(245,158,11,.15);color:var(--gold)}
+.search-box{position:relative;margin-bottom:1rem}
+.search-box input{padding-right:2rem}
+.search-icon{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);color:var(--gray)}
+.boat-card{background:var(--card);border-radius:12px;padding:.8rem;margin-bottom:.5rem;border:1px solid rgba(14,116,144,.2);cursor:pointer}
+.boat-name{font-weight:700;font-size:.9rem}
+.boat-owner{font-size:.7rem;color:var(--gray);margin:.2rem 0}
+.boat-stats{display:flex;gap:.5rem;margin-top:.3rem;font-size:.7rem;flex-wrap:wrap}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--navy);border-radius:20px;padding:1.2rem;width:90%;max-width:450px;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:1rem;font-weight:700;color:var(--aqua);margin-bottom:1rem;text-align:center}
+.modal-close{float:left;background:none;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.tx-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:.4rem;border-right:2px solid}
+.tx-item.charge{border-color:var(--red)}
+.tx-item.payment{border-color:var(--green)}
+.tx-label{font-size:.75rem;font-weight:600}
+.tx-date{font-size:.65rem;color:var(--gray)}
+.tx-amount{font-weight:700;font-size:.8rem}
+.balance-bar{display:flex;justify-content:space-between;background:var(--sea);border-radius:10px;padding:.6rem;margin-bottom:1rem}
+.balance-item{text-align:center}
+.balance-label{font-size:.6rem;color:var(--gray)}
+.balance-amount{font-weight:800;font-size:.8rem}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--sea);color:#fff;padding:.5rem 1rem;border-radius:20px;font-size:.8rem;z-index:999;display:none}
+.filter-row{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap}
+.filter-btn{background:var(--sea);border:1px solid var(--teal);color:var(--gray);border-radius:20px;padding:.3rem .8rem;font-size:.7rem;cursor:pointer}
+.filter-btn.active{background:var(--teal);color:#fff}
+.stats-grid-full{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem}
+.stat-card-big{background:linear-gradient(135deg,var(--card),var(--sea));border-radius:12px;padding:.8rem;text-align:center}
+.stat-card-big .val{font-size:1.3rem;font-weight:800;margin-top:.3rem}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <div style="font-size:3rem;margin-bottom:.5rem">⚓</div>
+    <div class="login-title">الميناء السياحي - التراكي</div>
+    <div class="login-sub">إدارة إيجار أماكن وقوف المراكب</div>
+    <div class="form-group">
+      <label>اسم المستخدم</label>
+      <input type="text" id="loginUser" placeholder="أدخل اسم المستخدم">
+    </div>
+    <div class="form-group">
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPass" placeholder="أدخل كلمة المرور">
+    </div>
+    <div id="loginError" class="error-msg"></div>
+    <button class="btn" onclick="doLogin()">دخول</button>
+    <div style="margin-top:1rem;border-top:1px solid rgba(255,255,255,.1);padding-top:.8rem">
+      <button onclick="hardReset()" style="background:none;border:1px solid var(--red);color:var(--red);border-radius:6px;padding:.3rem .8rem;font-size:.7rem;cursor:pointer;width:100%">إعادة تهيئة البيانات</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div>
+      <div style="display:flex;align-items:center;gap:.3rem">
+        <span class="topbar-title">⚓ التراكي - مارينا طرقي</span>
+      </div>
+      <div class="topbar-user" id="topbarUser"></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">خروج</button>
+  </div>
+  
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showTab('dashboard')">الرئيسية</div>
+    <div class="nav-tab" onclick="showTab('boats')">المراكب</div>
+    <div class="nav-tab" onclick="showTab('payments')">المدفوعات</div>
+    <div class="nav-tab" onclick="showTab('reports')">التقارير</div>
+    <div class="nav-tab admin-only" onclick="showTab('admin')" style="display:none">الإدارة</div>
+  </div>
+
+  <!-- الصفحة الرئيسية -->
+  <div class="section active" id="secDashboard">
+    <!-- الصف الأول: إحصائيات المراكب -->
+    <div class="stats-grid-full">
+      <div class="stat-card-big">
+        <div class="stat-label">🚤 عدد المراكب</div>
+        <div class="val" style="color:var(--aqua)" id="stTotalBoats">-</div>
+      </div>
+      <div class="stat-card-big">
+        <div class="stat-label">💰 إجمالي الاستحقاق</div>
+        <div class="val" style="color:var(--gold)" id="stTotalDue">-</div>
+      </div>
+      <div class="stat-card-big">
+        <div class="stat-label">📊 متوسط الإيجار</div>
+        <div class="val" style="color:var(--teal)" id="stAvgRent">-</div>
+      </div>
+    </div>
+
+    <!-- الصف الثاني: حالة السداد -->
+    <div class="stats-grid-full">
+      <div class="stat-card-big">
+        <div class="stat-label">✅ مراكب مسددة</div>
+        <div class="val" style="color:var(--green)" id="stPaidCount">-</div>
+        <div style="font-size:.7rem;color:var(--green);margin-top:.2rem" id="stPaidVal">-</div>
+      </div>
+      <div class="stat-card-big">
+        <div class="stat-label">⚠️ مراكب غير مسددة</div>
+        <div class="val" style="color:var(--red)" id="stLateCount">-</div>
+        <div style="font-size:.7rem;color:var(--red);margin-top:.2rem" id="stLateVal">-</div>
+      </div>
+      <div class="stat-card-big">
+        <div class="stat-label">📈 إجمالي المسدد</div>
+        <div class="val" style="color:var(--green)" id="stTotalPaid">-</div>
+      </div>
+    </div>
+
+    <!-- الصف الثالث: تصنيف المراكب حسب الطول -->
+    <div class="card">
+      <div class="card-title">📏 تصنيف المراكب حسب الطول</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">أقل من 20 متر</div><div class="stat-val" style="color:var(--aqua)" id="stLenUnder20">-</div></div>
+        <div class="stat-card"><div class="stat-label">20 - 25 متر</div><div class="stat-val" style="color:var(--gold)" id="stLen20to25">-</div></div>
+        <div class="stat-card"><div class="stat-label">أكبر من 25 متر</div><div class="stat-val" style="color:var(--teal)" id="stLenOver25">-</div></div>
+      </div>
+    </div>
+
+    <div class="card"><div class="card-title">⚠️ مراكب متأخرة في السداد</div><div id="lateList"></div></div>
+    <div class="card"><div class="card-title">🕐 آخر العمليات</div><div id="recentList"></div></div>
+  </div>
+
+  <!-- صفحة المراكب -->
+  <div class="section" id="secBoats">
+    <div class="search-box">
+      <input type="text" id="boatSearch" placeholder="بحث عن مركب أو مستثمر..." oninput="renderBoats()">
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
+      <button class="filter-btn" onclick="setFilter('late',this)">متأخر</button>
+      <button class="filter-btn" onclick="setFilter('paid',this)">مسدد</button>
+    </div>
+    <div id="boatList"></div>
+    <div class="admin-only" style="display:none;margin-top:1rem">
+      <button class="btn btn-success btn-sm" onclick="openAddBoat()">+ إضافة مركب جديد</button>
+    </div>
+  </div>
+
+  <!-- صفحة المدفوعات -->
+  <div class="section" id="secPayments">
+    <button class="btn btn-success btn-sm" style="margin-bottom:1rem" onclick="openAddTx(0)">+ تسجيل عملية جديدة</button>
+    <div class="search-box">
+      <input type="text" id="paySearch" placeholder="بحث في المعاملات..." oninput="renderPayments()">
+    </div>
+    <div class="tbl-wrap">
+      <table style="width:100%">
+        <thead><tr><th>التاريخ</th><th>المركب</th><th>البيان</th><th>المبلغ</th></tr></thead>
+        <tbody id="payTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- صفحة التقارير -->
+  <div class="section" id="secReports">
+    <div class="card">
+      <div class="card-title">📊 التقارير العامة</div>
+      <div class="export-btns" style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-gold btn-sm" onclick="exportAllStatementsPDF()">📄 طباعة كشف حساب لجميع المراكب</button>
+        <button class="btn btn-gold btn-sm" onclick="exportDepositsPDF()">📄 طباعة كشف تأمينات المراكب</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 تقرير شامل</div>
+      <div class="form-group"><label>اختر مركب</label><select id="rptBoat"><option value="all">جميع المراكب</option></select></div>
+      <button class="btn btn-sm" onclick="generateReport()">عرض التقرير</button>
+      <div id="rptExportBtns" style="display:none;margin-top:.5rem">
+        <button class="btn btn-sm" style="background:var(--red);color:#fff" onclick="exportReportPDF()">📄 PDF</button>
+        <button class="btn btn-sm" style="background:var(--green);color:#fff" onclick="exportReportExcel()">📊 Excel</button>
+      </div>
+    </div>
+    <div id="rptResult"></div>
+    
+    <div class="card">
+      <div class="card-title">📑 كشف حساب مركب</div>
+      <div class="form-group"><label>المركب</label><select id="stmtBoat"><option value="">اختر مركب...</option></select></div>
+      <button class="btn btn-sm btn-gold" onclick="showStatement()">عرض كشف الحساب</button>
+      <div id="stmtExportBtns" style="display:none;margin-top:.5rem">
+        <button class="btn btn-sm" style="background:var(--red);color:#fff" onclick="exportStatementPDF()">📄 PDF</button>
+        <button class="btn btn-sm" style="background:var(--green);color:#fff" onclick="exportStatementExcel()">📊 Excel</button>
+      </div>
+    </div>
+    <div id="stmtResult"></div>
+  </div>
+
+  <!-- صفحة الإدارة -->
+  <div class="section" id="secAdmin">
+    <div class="card">
+      <div class="card-title">👥 إدارة المستخدمين</div>
+      <div id="userList"></div>
+      <button class="btn btn-success btn-sm" style="margin-top:.5rem" onclick="openAddUser()">+ إضافة مستخدم</button>
+    </div>
+    <div class="card">
+      <div class="card-title">💾 النسخ الاحتياطي</div>
+      <button class="btn btn-sm" onclick="exportData()">📥 تصدير البيانات</button>
+      <div style="margin-top:.5rem">
+        <label style="font-size:.7rem">استيراد بيانات</label>
+        <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="padding:.3rem;font-size:.7rem">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙️ الاستحقاق التلقائي</div>
+      <p style="font-size:.7rem;color:var(--gray);margin-bottom:.5rem">يُضاف إيجار كل مركب تلقائياً في أول كل شهر</p>
+      <button class="btn btn-sm" onclick="runManualAutoCharge()">تشغيل الاستحقاق التلقائي</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="boatDetailModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('boatDetailModal')">✕</button>
+    <div class="modal-title" id="bdTitle"></div>
+    <div id="bdContent"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addTxModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addTxModal')">✕</button>
+    <div class="modal-title">تسجيل عملية</div>
+    <div id="txFormContent"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addBoatModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addBoatModal')">✕</button>
+    <div class="modal-title" id="addBoatTitle">إضافة مركب جديد</div>
+    <div id="addBoatForm"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addUserModal')">✕</button>
+    <div class="modal-title">إضافة مستخدم جديد</div>
+    <div id="addUserForm"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ========== البيانات الأولية ==========
+var STORAGE_KEY = 'taraki_marina_local';
+var cu = null;
+var filterMode = 'all';
+
+var MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+// بيانات المراكب الأولية
+var SEED_BOATS = [
+  {id:1, name:'يارا', owner:'مصباح مصباح عبدالمنعم', phone:'01222227998', area:12, pricePerM:350, monthlyRent:4200, start:'2026-01-01', end:'2026-03-31', deposit:4200},
+  {id:2, name:'إياد', owner:'مصباح مصباح عبدالمنعم', phone:'01222227998', area:12, pricePerM:350, monthlyRent:4200, start:'2026-01-01', end:'2026-03-31', deposit:4200},
+  {id:3, name:'يمني', owner:'مصباح مصباح عبدالمنعم', phone:'01222227998', area:12, pricePerM:350, monthlyRent:4200, start:'2026-01-01', end:'2026-03-31', deposit:4200},
+  {id:4, name:'بريما دايفنج', owner:'ابراهيم الدسوقي فتحي', phone:'01094471993', area:21, pricePerM:500, monthlyRent:10500, start:'2026-01-01', end:'2026-03-31', deposit:10500},
+  {id:5, name:'بريما', owner:'ابراهيم الدسوقي فتحي', phone:'01094471993', area:15, pricePerM:350, monthlyRent:5250, start:'2026-01-01', end:'2026-03-31', deposit:5250},
+  {id:6, name:'مير ميد', owner:'موسي ابوالحسن عبده', phone:'01003959291', area:18, pricePerM:350, monthlyRent:6300, start:'2026-01-01', end:'2026-03-31', deposit:6300},
+  {id:7, name:'ملو يلو', owner:'محمد انور رمضان', phone:'01117000046', area:23, pricePerM:500, monthlyRent:11500, start:'2026-01-01', end:'2026-03-31', deposit:11500},
+  {id:8, name:'الحوت الابيض', owner:'فتحي محي عبده محسن', phone:'01003987224', area:25, pricePerM:500, monthlyRent:12500, start:'2026-01-01', end:'2026-03-31', deposit:12500},
+  {id:9, name:'سويت مايا', owner:'محمود عيد عبداللطيف', phone:'01061295011', area:26, pricePerM:600, monthlyRent:15600, start:'2026-01-01', end:'2026-03-31', deposit:15600},
+  {id:10, name:'البرنس ادم', owner:'احمد العزب ابراهيم', phone:'01223245296', area:25, pricePerM:500, monthlyRent:12500, start:'2026-01-01', end:'2026-03-31', deposit:12500},
+  {id:11, name:'فان دايفيد', owner:'ناصر ماهر حماده', phone:'01224194582', area:25, pricePerM:500, monthlyRent:12500, start:'2026-01-01', end:'2026-03-31', deposit:12500},
+  {id:12, name:'دايموند ايزابيلا', owner:'النجار فراج حسين', phone:'01003517051', area:26, pricePerM:600, monthlyRent:15600, start:'2026-01-01', end:'2026-03-31', deposit:15600},
+  {id:13, name:'لينا', owner:'محمد محسن محمد', phone:'01019700089', area:17.85, pricePerM:350, monthlyRent:6247.5, start:'2026-01-01', end:'2026-03-31', deposit:0},
+  {id:14, name:'اميره', owner:'احمد رفعت محمد حسن', phone:'01227743768', area:24, pricePerM:500, monthlyRent:12000, start:'2026-01-01', end:'2026-03-31', deposit:12000},
+  {id:15, name:'ماروسكا', owner:'جيمي ميخائيل بلاجون', phone:'01100848173', area:16, pricePerM:350, monthlyRent:5600, start:'2026-01-01', end:'2026-03-31', deposit:5600},
+  {id:16, name:'حورس ستار N', owner:'اسلام ابو اليزيد', phone:'01007248875', area:24, pricePerM:500, monthlyRent:12000, start:'2026-01-01', end:'2026-03-31', deposit:12000},
+  {id:17, name:'فيش هانتر', owner:'رامي فايز جورج', phone:'01114469184', area:10, pricePerM:350, monthlyRent:3500, start:'2026-01-01', end:'2026-03-31', deposit:3500},
+  {id:18, name:'سي ستار', owner:'احمد محمد طه سالم', phone:'01010577777', area:8, pricePerM:350, monthlyRent:2800, start:'2026-01-01', end:'2026-03-31', deposit:2800},
+  {id:19, name:'رخاء', owner:'رخاء علاء الدين سعد', phone:'01007599896', area:10, pricePerM:350, monthlyRent:3500, start:'2026-01-01', end:'2026-03-31', deposit:3500},
+  {id:20, name:'براون شوجر', owner:'ماجد محمد حسني احمد', phone:'01001910216', area:7, pricePerM:350, monthlyRent:2450, start:'2026-01-01', end:'2026-03-31', deposit:2450}
+];
+
+function initDB() {
+  var saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      var data = JSON.parse(saved);
+      if (data.boats && data.boats.length > 0) return data;
+    } catch(e) {}
+  }
+  return {
+    users: [
+      {id:1, username:'admin', password:'taraki2026', name:'المدير', role:'admin'},
+      {id:2, username:'محاسب', password:'1234', name:'المحاسب', role:'user'}
+    ],
+    boats: SEED_BOATS.map(function(b, i) { return { ...b, active: true, notes: '' }; }),
+    transactions: [],
+    autoLog: {},
+    nextTxId: 1,
+    nextBoatId: 21,
+    _ts: Date.now()
+  };
+}
+
+var db = initDB();
+
+function saveDB() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(function() { t.style.display = 'none'; }, 2000);
+}
+
+function formatMoney(n) {
+  return (Math.round(n * 100) / 100).toLocaleString('ar-EG') + ' ج.م';
+}
+
+function formatDate(d) {
+  if (!d) return '-';
+  try { return new Date(d).toLocaleDateString('ar-EG'); }
+  catch(e) { return d; }
+}
+
+function getBalance(boatId) {
+  var charged = 0, paid = 0;
+  db.transactions.forEach(function(t) {
+    if (t.boatId !== boatId) return;
+    if (t.type === 'charge') charged += t.amount;
+    else paid += t.amount;
+  });
+  return { charged: charged, paid: paid, remaining: charged - paid };
+}
+
+function doLogin() {
+  var u = document.getElementById('loginUser').value.trim();
+  var p = document.getElementById('loginPass').value;
+  var user = db.users.find(function(x) { return x.username === u && x.password === p; });
+  if (!user) {
+    document.getElementById('loginError').textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+    return;
+  }
+  cu = user;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('topbarUser').textContent = user.name + (user.role === 'admin' ? ' (مدير)' : '');
+  if (user.role === 'admin') {
+    document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = ''; });
+  }
+  renderDashboard();
+  renderBoats();
+  renderPayments();
+  populateSelects();
+}
+
+function doLogout() {
+  cu = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function showTab(tab) {
+  var sections = ['dashboard', 'boats', 'payments', 'reports', 'admin'];
+  sections.forEach(function(t) {
+    var sec = document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (sec) sec.classList.remove('active');
+  });
+  document.getElementById('sec' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  
+  var navBtns = document.querySelectorAll('.nav-tab');
+  navBtns.forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+  var activeBtn = document.querySelector('.nav-tab[onclick*="' + tab + '"]');
+  if (activeBtn) activeBtn.classList.add('active');
+  
+  if (tab === 'reports') populateSelects();
+}
+
+function renderDashboard() {
+  var boats = db.boats.filter(function(b) { return b.active; });
+  var totalCharged = 0, totalPaid = 0, paidCount = 0, lateCount = 0, lateVal = 0;
+  var lenUnder20 = 0, len20to25 = 0, lenOver25 = 0;
+  var totalRentSum = 0;
+  
+  boats.forEach(function(b) {
+    var bal = getBalance(b.id);
+    totalCharged += bal.charged;
+    totalPaid += bal.paid;
+    totalRentSum += b.monthlyRent;
+    
+    if (bal.remaining <= 0.01) paidCount++;
+    else { lateCount++; lateVal += bal.remaining; }
+    
+    var length = b.area;
+    if (length < 20) lenUnder20++;
+    else if (length >= 20 && length <= 25) len20to25++;
+    else if (length > 25) lenOver25++;
+  });
+  
+  var avgRent = boats.length > 0 ? totalRentSum / boats.length : 0;
+  
+  document.getElementById('stTotalBoats').textContent = boats.length;
+  document.getElementById('stTotalDue').textContent = formatMoney(totalCharged);
+  document.getElementById('stAvgRent').textContent = formatMoney(avgRent);
+  
+  document.getElementById('stPaidCount').textContent = paidCount;
+  document.getElementById('stPaidVal').textContent = formatMoney(totalPaid);
+  document.getElementById('stLateCount').textContent = lateCount;
+  document.getElementById('stLateVal').textContent = formatMoney(lateVal);
+  document.getElementById('stTotalPaid').textContent = formatMoney(totalPaid);
+  
+  document.getElementById('stLenUnder20').textContent = lenUnder20;
+  document.getElementById('stLen20to25').textContent = len20to25;
+  document.getElementById('stLenOver25').textContent = lenOver25;
+  
+  var late = boats.filter(function(b) { return getBalance(b.id).remaining > 0.01; });
+  late.sort(function(a,b) { return getBalance(b.id).remaining - getBalance(a.id).remaining; });
+  var lateList = document.getElementById('lateList');
+  if (!late.length) lateList.innerHTML = '<p style="color:var(--green);text-align:center;padding:1rem">✅ جميع المراكب في الوضع الجيد</p>';
+  else lateList.innerHTML = late.slice(0, 5).map(function(b) {
+    var bal = getBalance(b.id);
+    return '<div class="boat-card" onclick="openDetail(' + b.id + ')">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<div><div class="boat-name">' + b.name + '</div><div class="boat-owner">' + b.owner + '</div></div>' +
+      '<span class="badge badge-red">' + formatMoney(bal.remaining) + '</span>' +
+      '</div></div>';
+  }).join('');
+  
+  var rec = db.transactions.slice().sort(function(a,b) { return new Date(b.date) - new Date(a.date); }).slice(0, 5);
+  var recList = document.getElementById('recentList');
+  if (!rec.length) recList.innerHTML = '<p style="color:var(--gray);text-align:center;padding:1rem">لا توجد معاملات حديثة</p>';
+  else recList.innerHTML = rec.map(function(t) {
+    var boat = db.boats.find(function(b) { return b.id === t.boatId; });
+    return '<div class="tx-item ' + t.type + '">' +
+      '<div><div class="tx-label">' + (boat ? boat.name : '?') + ' - ' + t.desc + '</div><div class="tx-date">' + formatDate(t.date) + '</div></div>' +
+      '<div class="tx-amount" style="color:' + (t.type === 'charge' ? 'var(--red)' : 'var(--green)') + '">' + (t.type === 'charge' ? '+' : '-') + ' ' + formatMoney(t.amount) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function renderBoats() {
+  var q = (document.getElementById('boatSearch')?.value || '').toLowerCase();
+  var boats = db.boats.filter(function(b) {
+    if (!b.active) return false;
+    if (q && !b.name.toLowerCase().includes(q) && !b.owner.toLowerCase().includes(q)) return false;
+    var rem = getBalance(b.id).remaining;
+    if (filterMode === 'late' && rem <= 0.01) return false;
+    if (filterMode === 'paid' && rem > 0.01) return false;
+    return true;
+  });
+  boats.sort(function(a,b) { return a.name.localeCompare(b.name, 'ar'); });
+  var el = document.getElementById('boatList');
+  if (!boats.length) { el.innerHTML = '<p style="color:var(--gray);text-align:center;padding:2rem">لا توجد نتائج</p>'; return; }
+  el.innerHTML = boats.map(function(b) {
+    var bal = getBalance(b.id);
+    var status = bal.remaining > 0.01 ? '<span class="badge badge-red">متأخر</span>' : '<span class="badge badge-green">مسدد</span>';
+    return '<div class="boat-card" onclick="openDetail(' + b.id + ')">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+      '<div><div class="boat-name">' + b.name + '</div><div class="boat-owner">' + b.owner + (b.phone ? ' · ' + b.phone : '') + '</div></div>' +
+      status + '</div>' +
+      '<div class="boat-stats"><span>📏 ' + b.area + 'م</span><span style="color:var(--gold)">💰 ' + formatMoney(b.monthlyRent) + '/شهر</span></div>' +
+      '</div>';
+  }).join('');
+}
+
+function setFilter(f, btn) {
+  filterMode = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderBoats();
+}
+
+function renderPayments() {
+  var q = (document.getElementById('paySearch')?.value || '').toLowerCase();
+  var txs = db.transactions.slice().sort(function(a,b) { return new Date(b.date) - new Date(a.date); });
+  if (q) {
+    txs = txs.filter(function(t) {
+      var boat = db.boats.find(function(b) { return b.id === t.boatId; });
+      return (boat && boat.name.toLowerCase().includes(q)) || t.desc.toLowerCase().includes(q);
+    });
+  }
+  var html = txs.map(function(t) {
+    var boat = db.boats.find(function(b) { return b.id === t.boatId; });
+    return '<tr><td>' + formatDate(t.date) + '</td><td>' + (boat ? boat.name : '?') + '</td><td>' + t.desc + '</td><td style="color:' + (t.type === 'charge' ? 'var(--red)' : 'var(--green)') + '">' + (t.type === 'charge' ? '+' : '-') + ' ' + formatMoney(t.amount) + '</td></tr>';
+  }).join('');
+  document.getElementById('payTable').innerHTML = html || '<tr><td colspan="4" style="text-align:center">لا توجد معاملات</td></tr>';
+}
+
+function populateSelects() {
+  var boats = db.boats.filter(function(b) { return b.active; });
+  boats.sort(function(a,b) { return a.name.localeCompare(b.name, 'ar'); });
+  
+  var rptB = document.getElementById('rptBoat');
+  if (rptB) rptB.innerHTML = '<option value="all">جميع المراكب</option>' + boats.map(function(b) { return '<option value="' + b.id + '">' + b.name + '</option>'; }).join('');
+  
+  var stmtB = document.getElementById('stmtBoat');
+  if (stmtB) stmtB.innerHTML = '<option value="">اختر مركب...</option>' + boats.map(function(b) { return '<option value="' + b.id + '">' + b.name + '</option>'; }).join('');
+}
+
+function generateReport() {
+  var val = document.getElementById('rptBoat').value;
+  var boats = val === 'all' ? db.boats.filter(function(b) { return b.active; }) : db.boats.filter(function(b) { return b.id === parseInt(val); });
+  
+  var html = '<div class="card"><div class="tbl-wrap"><table><thead>一面<th>المركب</th><th>المالك</th><th>المساحة</th><th>المستحق</th><th>المسدد</th><th>الرصيد</th></tr></thead><tbody>';
+  var totC = 0, totP = 0;
+  boats.forEach(function(b) {
+    var bal = getBalance(b.id);
+    totC += bal.charged; totP += bal.paid;
+    html += '<tr><td>' + b.name + '</td><td>' + b.owner + '</td><td>' + b.area + ' م</td><td>' + formatMoney(bal.charged) + '</td><td>' + formatMoney(bal.paid) + '</td><td style="color:' + (bal.remaining > 0 ? 'var(--red)' : 'var(--green)') + '">' + formatMoney(Math.abs(bal.remaining)) + (bal.remaining < 0 ? ' (مقدم)' : '') + '</td></tr>';
+  });
+  html += '<tr style="font-weight:bold;background:rgba(255,255,255,0.05)"><td colspan="3">الإجمالي</td><td>' + formatMoney(totC) + '</td><td>' + formatMoney(totP) + '</td><td>' + formatMoney(totC - totP) + '</td></tr>';
+  html += '</tbody></table></div></div>';
+  document.getElementById('rptResult').innerHTML = html;
+  document.getElementById('rptExportBtns').style.display = 'flex';
+}
+
+function showStatement() {
+  var id = parseInt(document.getElementById('stmtBoat').value);
+  if (!id) { toast('اختر مركباً أولاً'); return; }
+  var b = db.boats.find(function(x) { return x.id === id; });
+  if (!b) return;
+  var bal = getBalance(id);
+  var txs = db.transactions.filter(function(t) { return t.boatId === id; }).sort(function(a,b) { return new Date(a.date) - new Date(b.date); });
+  
+  var html = '<div class="card"><div class="card-title">كشف حساب: ' + b.name + '</div><div class="tbl-wrap"><table><thead><tr><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th><th>الرصيد</th></tr></thead><tbody>';
+  var run = 0;
+  txs.forEach(function(t) {
+    run = run + (t.type === 'charge' ? t.amount : -t.amount);
+    html += '<tr><td>' + formatDate(t.date) + '</td><td>' + t.desc + '</td><td>' + (t.type === 'charge' ? formatMoney(t.amount) : '-') + '</td><td>' + (t.type === 'payment' ? formatMoney(t.amount) : '-') + '</td><td>' + formatMoney(run) + '</td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+  document.getElementById('stmtResult').innerHTML = html;
+  document.getElementById('stmtExportBtns').style.display = 'flex';
+}
+
+function openDetail(id) {
+  var b = db.boats.find(function(x) { return x.id === id; });
+  if (!b) return;
+  var bal = getBalance(id);
+  var txs = db.transactions.filter(function(t) { return t.boatId === id; }).sort(function(a,b) { return new Date(b.date) - new Date(a.date); });
+  var canEdit = cu && cu.role !== 'viewer';
+  
+  document.getElementById('bdTitle').textContent = b.name;
+  var html = '<div class="balance-bar">' +
+    '<div class="balance-item"><div class="balance-label">المستحق</div><div class="balance-amount" style="color:var(--red)">' + formatMoney(bal.charged) + '</div></div>' +
+    '<div class="balance-item"><div class="balance-label">المسدد</div><div class="balance-amount" style="color:var(--green)">' + formatMoney(bal.paid) + '</div></div>' +
+    '<div class="balance-item"><div class="balance-label">الرصيد</div><div class="balance-amount" style="color:' + (bal.remaining > 0 ? 'var(--red)' : 'var(--green)') + '">' + formatMoney(Math.abs(bal.remaining)) + (bal.remaining < 0 ? ' (مقدم)' : '') + '</div></div>' +
+  '</div>';
+  
+  html += '<div style="margin-bottom:1rem;font-size:.75rem;color:var(--gray)">' +
+    '<div>المالك: ' + b.owner + '</div>' +
+    '<div>الهاتف: ' + (b.phone || '-') + '</div>' +
+    '<div>المساحة: ' + b.area + ' م · الإيجار: ' + formatMoney(b.monthlyRent) + ' / شهر</div>' +
+    '<div>التأمين: ' + formatMoney(b.deposit || 0) + '</div>' +
+  '</div>';
+  
+  if (canEdit) {
+    html += '<div style="display:flex;gap:.5rem;margin-bottom:1rem">' +
+      '<button class="btn btn-sm btn-success" onclick="openAddTx(' + b.id + ')">+ عملية</button>' +
+      '<button class="btn btn-sm" onclick="openEditBoat(' + b.id + ')">✏️ تعديل</button>' +
+    '</div>';
+  }
+  
+  html += '<div class="card-title" style="font-size:.8rem">سجل المعاملات</div>';
+  if (!txs.length) {
+    html += '<p style="color:var(--gray);text-align:center;padding:1rem">لا توجد معاملات مسجلة</p>';
+  } else {
+    html += txs.map(function(t) {
+      var actionBtns = canEdit ? '<div style="display:flex;gap:.4rem;margin-top:.3rem">' +
+        '<button class="btn-sm" style="background:var(--teal);border:none;color:#fff;padding:.2rem .6rem;border-radius:4px;font-size:.65rem" onclick="event.stopPropagation();openEditTx(' + t.id + ',' + b.id + ')">تعديل</button>' +
+        '<button class="btn-sm" style="background:var(--red);border:none;color:#fff;padding:.2rem .6rem;border-radius:4px;font-size:.65rem" onclick="event.stopPropagation();deleteTx(' + t.id + ',' + b.id + ')">حذف</button>' +
+        '</div>' : '';
+      return '<div class="tx-item ' + t.type + '">' +
+        '<div style="flex:1"><div class="tx-label">' + t.desc + '</div><div class="tx-date">' + formatDate(t.date) + (t.notes ? ' · ' + t.notes : '') + '</div>' + actionBtns + '</div>' +
+        '<div class="tx-amount" style="color:' + (t.type === 'charge' ? 'var(--red)' : 'var(--green)') + '">' + formatMoney(t.amount) + '</div>' +
+        '</div>';
+    }).join('');
+  }
+  
+  document.getElementById('bdContent').innerHTML = html;
+  openModal('boatDetailModal');
+}
+
+function openAddTx(boatId) {
+  var boats = db.boats.filter(function(b) { return b.active; });
+  var boatOptions = boats.map(function(b) { return '<option value="' + b.id + '"' + (b.id === boatId ? ' selected' : '') + '>' + b.name + '</option>'; }).join('');
+  var html = '<div class="form-group"><label>المركب</label><select id="txBoat">' + boatOptions + '</select></div>' +
+    '<div class="form-group"><label>نوع العملية</label><select id="txType"><option value="charge">استحقاق إيجار</option><option value="payment">دفع / تحصيل</option></select></div>' +
+    '<div class="form-group"><label>البيان</label><input type="text" id="txDesc" placeholder="مثال: إيجار شهر أبريل"></div>' +
+    '<div class="two-col"><div class="form-group"><label>المبلغ (جنيه)</label><input type="number" id="txAmount" step="0.01" placeholder="0.00"></div>' +
+    '<div class="form-group"><label>التاريخ</label><input type="date" id="txDate" value="' + new Date().toISOString().slice(0,10) + '"></div></div>' +
+    '<div class="form-group"><label>ملاحظات</label><textarea id="txNote" rows="2" style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--sea);border-radius:8px;color:#fff;padding:.5rem"></textarea></div>' +
+    '<div id="txErr" class="error-msg"></div>' +
+    '<button class="btn btn-success" onclick="saveTx()">حفظ العملية</button>';
+  document.getElementById('txFormContent').innerHTML = html;
+  openModal('addTxModal');
+}
+
+function saveTx() {
+  var boatId = parseInt(document.getElementById('txBoat').value);
+  var type = document.getElementById('txType').value;
+  var desc = document.getElementById('txDesc').value.trim();
+  var amount = parseFloat(document.getElementById('txAmount').value);
+  var date = document.getElementById('txDate').value;
+  var note = document.getElementById('txNote').value.trim();
+  var err = document.getElementById('txErr');
+  
+  if (!desc) { err.textContent = 'يرجى إدخال البيان'; return; }
+  if (!amount || amount <= 0) { err.textContent = 'يرجى إدخال مبلغ صحيح'; return; }
+  if (!date) { err.textContent = 'يرجى اختيار التاريخ'; return; }
+  
+  db.transactions.push({
+    id: db.nextTxId++,
+    boatId: boatId,
+    type: type,
+    desc: desc,
+    amount: amount,
+    date: date,
+    notes: note
+  });
+  saveDB();
+  closeModal('addTxModal');
+  toast('تم حفظ العملية بنجاح');
+  renderDashboard();
+  renderBoats();
+  renderPayments();
+  var boatDetail = document.getElementById('boatDetailModal');
+  if (boatDetail.classList.contains('open')) {
+    var boat = db.boats.find(function(b) { return b.id === boatId; });
+    if (boat) openDetail(boatId);
+  }
+}
+
+function openEditBoat(id) {
+  var b = db.boats.find(function(x) { return x.id === id; });
+  if (!b) return;
+  closeModal('boatDetailModal');
+  document.getElementById('addBoatTitle').textContent = 'تعديل بيانات المركب';
+  var html = '<input type="hidden" id="eb_id" value="' + b.id + '">' +
+    '<div class="form-group"><label>اسم المركب</label><input type="text" id="eb_name" value="' + b.name + '"></div>' +
+    '<div class="form-group"><label>المالك</label><input type="text" id="eb_owner" value="' + b.owner + '"></div>' +
+    '<div class="form-group"><label>الهاتف</label><input type="text" id="eb_phone" value="' + (b.phone || '') + '"></div>' +
+    '<div class="two-col"><div class="form-group"><label>المساحة (م)</label><input type="number" id="eb_area" step="0.01" value="' + b.area + '"></div>' +
+    '<div class="form-group"><label>سعر المتر</label><input type="number" id="eb_price" value="' + b.pricePerM + '"></div></div>' +
+    '<div class="two-col"><div class="form-group"><label>تاريخ البداية</label><input type="date" id="eb_start" value="' + (b.start || '') + '"></div>' +
+    '<div class="form-group"><label>تاريخ النهاية</label><input type="date" id="eb_end" value="' + (b.end || '') + '"></div></div>' +
+    '<div class="form-group"><label>التأمين</label><input type="number" id="eb_deposit" step="0.01" value="' + (b.deposit || 0) + '"></div>' +
+    '<div class="form-group"><label>ملاحظات</label><textarea id="eb_notes" rows="2" style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--sea);border-radius:8px;color:#fff;padding:.5rem">' + (b.notes || '') + '</textarea></div>' +
+    '<div id="ebErr" class="error-msg"></div>' +
+    '<div style="display:flex;gap:.5rem"><button class="btn btn-success" style="flex:1" onclick="saveEditBoat()">حفظ</button>' +
+    '<button class="btn btn-danger" style="flex:1" onclick="deleteBoat()">حذف المركب</button></div>';
+  document.getElementById('addBoatForm').innerHTML = html;
+  openModal('addBoatModal');
+}
+
+function saveEditBoat() {
+  var id = parseInt(document.getElementById('eb_id').value);
+  var b = db.boats.find(function(x) { return x.id === id; });
+  if (!b) return;
+  
+  b.name = document.getElementById('eb_name').value.trim();
+  b.owner = document.getElementById('eb_owner').value.trim();
+  b.phone = document.getElementById('eb_phone').value.trim();
+  b.area = parseFloat(document.getElementById('eb_area').value);
+  b.pricePerM = parseFloat(document.getElementById('eb_price').value);
+  b.monthlyRent = b.area * b.pricePerM;
+  b.start = document.getElementById('eb_start').value;
+  b.end = document.getElementById('eb_end').value;
+  b.deposit = parseFloat(document.getElementById('eb_deposit').value) || 0;
+  b.notes = document.getElementById('eb_notes').value.trim();
+  
+  saveDB();
+  closeModal('addBoatModal');
+  toast('تم تعديل المركب');
+  renderBoats();
+  renderDashboard();
+  openDetail(id);
+}
+
+function deleteBoat() {
+  var id = parseInt(document.getElementById('eb_id').value);
+  if (!confirm('هل أنت متأكد من حذف هذا المركب وجميع معاملاته؟')) return;
+  db.boats = db.boats.filter(function(x) { return x.id !== id; });
+  db.transactions = db.transactions.filter(function(t) { return t.boatId !== id; });
+  if (db.autoLog[id]) delete db.autoLog[id];
+  saveDB();
+  closeModal('addBoatModal');
+  toast('تم حذف المركب');
+  renderBoats();
+  renderDashboard();
+}
+
+function openAddBoat() {
+  document.getElementById('addBoatTitle').textContent = 'إضافة مركب جديد';
+  var html = '<div class="form-group"><label>اسم المركب</label><input type="text" id="nb_name" placeholder="اسم اللنش"></div>' +
+    '<div class="form-group"><label>المالك</label><input type="text" id="nb_owner"></div>' +
+    '<div class="form-group"><label>الهاتف</label><input type="text" id="nb_phone" placeholder="01xxxxxxxxx"></div>' +
+    '<div class="two-col"><div class="form-group"><label>المساحة (م)</label><input type="number" id="nb_area" step="0.01" placeholder="12"></div>' +
+    '<div class="form-group"><label>سعر المتر (جنيه)</label><input type="number" id="nb_price" placeholder="350"></div></div>' +
+    '<div class="two-col"><div class="form-group"><label>تاريخ البداية</label><input type="date" id="nb_start"></div>' +
+    '<div class="form-group"><label>تاريخ النهاية (اختياري)</label><input type="date" id="nb_end"></div></div>' +
+    '<div class="form-group"><label>التأمين (اختياري)</label><input type="number" id="nb_deposit" step="0.01" placeholder="0.00"></div>' +
+    '<div id="nbErr" class="error-msg"></div>' +
+    '<button class="btn btn-success" onclick="saveNewBoat()">إضافة المركب</button>';
+  document.getElementById('addBoatForm').innerHTML = html;
+  openModal('addBoatModal');
+}
+
+function saveNewBoat() {
+  var name = document.getElementById('nb_name').value.trim();
+  var owner = document.getElementById('nb_owner').value.trim();
+  var area = parseFloat(document.getElementById('nb_area').value);
+  var price = parseFloat(document.getElementById('nb_price').value);
+  var err = document.getElementById('nbErr');
+  
+  if (!name || !owner || !area || !price) { err.textContent = 'يرجى إكمال البيانات الأساسية'; return; }
+  
+  db.boats.push({
+    id: db.nextBoatId++,
+    name: name,
+    owner: owner,
+    phone: document.getElementById('nb_phone').value.trim(),
+    area: area,
+    pricePerM: price,
+    monthlyRent: area * price,
+    start: document.getElementById('nb_start').value || '',
+    end: document.getElementById('nb_end').value || '',
+    deposit: parseFloat(document.getElementById('nb_deposit').value) || 0,
+    active: true,
+    notes: ''
+  });
+  saveDB();
+  closeModal('addBoatModal');
+  toast('تم إضافة المركب');
+  renderBoats();
+  renderDashboard();
+  populateSelects();
+}
+
+function openEditTx(txId, boatId) {
+  var tx = db.transactions.find(function(t) { return t.id === txId; });
+  if (!tx) return;
+  var html = '<input type="hidden" id="etx_id" value="' + tx.id + '">' +
+    '<input type="hidden" id="etx_boatId" value="' + boatId + '">' +
+    '<div class="form-group"><label>نوع العملية</label><select id="etx_type"><option value="charge"' + (tx.type === 'charge' ? ' selected' : '') + '>استحقاق</option><option value="payment"' + (tx.type === 'payment' ? ' selected' : '') + '>دفع</option></select></div>' +
+    '<div class="form-group"><label>البيان</label><input type="text" id="etx_desc" value="' + tx.desc.replace(/"/g, '&quot;') + '"></div>' +
+    '<div class="two-col"><div class="form-group"><label>المبلغ</label><input type="number" id="etx_amount" step="0.01" value="' + tx.amount + '"></div>' +
+    '<div class="form-group"><label>التاريخ</label><input type="date" id="etx_date" value="' + tx.date + '"></div></div>' +
+    '<div class="form-group"><label>ملاحظات</label><textarea id="etx_note" rows="2" style="width:100%;background:rgba(255,255,255,.07);border:1px solid var(--sea);border-radius:8px;color:#fff;padding:.5rem">' + (tx.notes || '') + '</textarea></div>' +
+    '<div id="etxErr" class="error-msg"></div>' +
+    '<button class="btn btn-gold" onclick="saveEditTx()">حفظ التعديلات</button>';
+  document.getElementById('txFormContent').innerHTML = html;
+  openModal('addTxModal');
+}
+
+function saveEditTx() {
+  var txId = parseInt(document.getElementById('etx_id').value);
+  var boatId = parseInt(document.getElementById('etx_boatId').value);
+  var tx = db.transactions.find(function(t) { return t.id === txId; });
+  if (!tx) return;
+  
+  tx.type = document.getElementById('etx_type').value;
+  tx.desc = document.getElementById('etx_desc').value.trim();
+  tx.amount = parseFloat(document.getElementById('etx_amount').value);
+  tx.date = document.getElementById('etx_date').value;
+  tx.notes = document.getElementById('etx_note').value.trim();
+  
+  saveDB();
+  closeModal('addTxModal');
+  toast('تم التعديل');
+  renderDashboard();
+  renderBoats();
+  renderPayments();
+  openDetail(boatId);
+}
+
+function deleteTx(txId, boatId) {
+  if (!confirm('هل أنت متأكد من حذف هذه المعاملة؟')) return;
+  db.transactions = db.transactions.filter(function(t) { return t.id !== txId; });
+  saveDB();
+  toast('تم حذف المعاملة');
+  renderDashboard();
+  renderBoats();
+  renderPayments();
+  openDetail(boatId);
+}
+
+function openAddUser() {
+  var html = '<div class="form-group"><label>اسم المستخدم</label><input type="text" id="nu_user" placeholder="username"></div>' +
+    '<div class="form-group"><label>كلمة المرور</label><input type="password" id="nu_pass" placeholder="كلمة المرور"></div>' +
+    '<div class="form-group"><label>الاسم الكامل</label><input type="text" id="nu_name" placeholder="الاسم"></div>' +
+    '<div class="form-group"><label>الصلاحية</label><select id="nu_role"><option value="viewer">مشاهدة فقط</option><option value="user">مستخدم</option><option value="admin">مدير</option></select></div>' +
+    '<div id="nuErr" class="error-msg"></div>' +
+    '<button class="btn btn-success" onclick="saveNewUser()">إضافة المستخدم</button>';
+  document.getElementById('addUserForm').innerHTML = html;
+  openModal('addUserModal');
+}
+
+function saveNewUser() {
+  var user = document.getElementById('nu_user').value.trim();
+  var pass = document.getElementById('nu_pass').value;
+  var name = document.getElementById('nu_name').value.trim();
+  var role = document.getElementById('nu_role').value;
+  var err = document.getElementById('nuErr');
+  
+  if (!user || !pass || !name) { err.textContent = 'يرجى إكمال جميع الحقول'; return; }
+  if (db.users.length >= 10) { err.textContent = 'تم الوصول للحد الأقصى للمستخدمين'; return; }
+  
+  var dup = db.users.some(function(u) { return u.username === user; });
+  if (dup) { err.textContent = 'اسم المستخدم موجود مسبقاً'; return; }
+  
+  var nextId = Math.max(...db.users.map(function(u) { return u.id; }), 0) + 1;
+  db.users.push({ id: nextId, username: user, password: pass, name: name, role: role });
+  saveDB();
+  closeModal('addUserModal');
+  toast('تم إضافة المستخدم');
+  renderAdmin();
+}
+
+function deleteUser(id) {
+  if (id === 1) return;
+  if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+  db.users = db.users.filter(function(u) { return u.id !== id; });
+  saveDB();
+  renderAdmin();
+  toast('تم حذف المستخدم');
+}
+
+function renderAdmin() {
+  var ul = document.getElementById('userList');
+  ul.innerHTML = db.users.map(function(u) {
+    return '<div class="tx-item" style="border-color:var(--aqua)">' +
+      '<div><div class="tx-label">' + u.name + ' (' + u.username + ')</div><div class="tx-date">الصلاحية: ' + (u.role === 'admin' ? 'مدير' : u.role === 'user' ? 'مستخدم' : 'مشاهد') + '</div></div>' +
+      (u.id !== 1 ? '<button class="btn-sm" style="background:var(--red);border:none;color:#fff;padding:.2rem .6rem;border-radius:4px" onclick="deleteUser(' + u.id + ')">حذف</button>' : '') +
+      '</div>';
+  }).join('');
+  document.getElementById('userCount').textContent = 'عدد المستخدمين: ' + db.users.length + ' / 10';
+}
+
+function exportData() {
+  var blob = new Blob([JSON.stringify(db)], {type: 'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'taraki_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('تم تصدير البيانات');
+}
+
+function importData(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (data.boats && data.transactions) {
+        if (confirm('سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟')) {
+          db = data;
+          saveDB();
+          location.reload();
+        }
+      }
+    } catch(err) { alert('ملف غير صالح'); }
+  };
+  reader.readAsText(file);
+}
+
+function hardReset() {
+  if (confirm('سيتم مسح جميع البيانات وإعادة التطبيق لحالته الأصلية. هل أنت متأكد؟')) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+function runManualAutoCharge() {
+  var now = new Date();
+  var nowY = now.getFullYear(), nowM = now.getMonth() + 1;
+  var added = [];
+  
+  db.boats.forEach(function(boat) {
+    if (!boat.active || !(boat.monthlyRent > 0)) return;
+    if (!db.autoLog[boat.id]) db.autoLog[boat.id] = [];
+    
+    var registered = {};
+    db.autoLog[boat.id].forEach(function(k) { registered[k] = true; });
+    db.transactions.forEach(function(t) {
+      if (t.boatId === boat.id && t.auto && t.type === 'charge') {
+        var k = t.date.slice(0, 7);
+        registered[k] = true;
+        if (db.autoLog[boat.id].indexOf(k) === -1) db.autoLog[boat.id].push(k);
+      }
+    });
+    
+    var key = nowY + '-' + (nowM < 10 ? '0' + nowM : '' + nowM);
+    if (!registered[key]) {
+      var dateStr = nowY + '-' + (nowM < 10 ? '0' + nowM : '' + nowM) + '-01';
+      db.transactions.push({
+        id: db.nextTxId++,
+        boatId: boat.id,
+        type: 'charge',
+        desc: 'ايجار شهر ' + MONTHS[nowM-1] + ' ' + nowY,
+        amount: boat.monthlyRent,
+        date: dateStr,
+        notes: 'تلقائي',
+        auto: true
+      });
+      db.autoLog[boat.id].push(key);
+      added.push(boat.name + ' - ' + MONTHS[nowM-1] + ' ' + nowY);
+    }
+  });
+  
+  if (added.length > 0) {
+    saveDB();
+    toast('تم إضافة ' + added.length + ' استحقاق تلقائي');
+    renderDashboard();
+    renderBoats();
+    renderPayments();
+  } else {
+    toast('لا توجد استحقاقات جديدة لهذا الشهر');
+  }
+}
+
+// وظائف التقارير
+function exportAllStatementsPDF() {
+  var win = window.open('', '_blank');
+  var boats = db.boats.filter(function(b) { return b.active; });
+  var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>كشف حساب جماعي</title><style>body{font-family:Tahoma,sans-serif;padding:20px;direction:rtl}.page-break{page-break-after:always}h3{color:#0e7490}table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:15px}th,td{border:1px solid #ccc;padding:5px;text-align:right}th{background:#1a3a5c;color:#fff}</style></head><body>';
+  boats.forEach(function(b, idx) {
+    var bal = getBalance(b.id);
+    var txs = db.transactions.filter(function(t) { return t.boatId === b.id; }).sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+    html += '<h3>كشف حساب: ' + b.name + '</h3><p>المالك: ' + b.owner + ' | الهاتف: ' + (b.phone||'-') + '</p>';
+    html += '<table><thead><tr><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th><th>الرصيد</th></tr></thead><tbody>';
+    var run = 0;
+    txs.forEach(function(t) {
+      run = run + (t.type === 'charge' ? t.amount : -t.amount);
+      html += '<tr><td>' + formatDate(t.date) + '</td><td>' + t.desc + '</td><td>' + (t.type==='charge'?formatMoney(t.amount):'-') + '</td><td>' + (t.type==='payment'?formatMoney(t.amount):'-') + '</td><td>' + formatMoney(run) + '</td></tr>';
+    });
+    html += '<tr style="font-weight:bold"><td colspan="2">الإجمالي</td><td>' + formatMoney(bal.charged) + '</td><td>' + formatMoney(bal.paid) + '</td><td>' + formatMoney(bal.remaining) + '</td></tr>';
+    html += '</tbody></table>';
+    if (idx < boats.length-1) html += '<div class="page-break"></div>';
+  });
+  html += '</body></html>';
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function() { win.print(); }, 500);
+}
+
+function exportDepositsPDF() {
+  var win = window.open('', '_blank');
+  var boats = db.boats.filter(function(b) { return b.active; });
+  var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>كشف التأمينات</title><style>body{font-family:Tahoma,sans-serif;padding:20px;direction:rtl}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:8px;text-align:right}th{background:#1a3a5c;color:#fff}</style></head><body><h2>كشف تأمينات المراكب</h2></table><thead><th>#</th><th>اسم المركب</th><th>المالك</th><th>قيمة التأمين</th></thead><tbody>';
+  var total = 0;
+  boats.forEach(function(b, i) {
+    var dep = b.deposit || 0;
+    total += dep;
+    html += '<tr><td>' + (i+1) + '</td><td>' + b.name + '</td><td>' + b.owner + '</td><td>' + formatMoney(dep) + '</td></tr>';
+  });
+  html += '<tr style="font-weight:bold"><td colspan="3">الإجمالي</td><td>' + formatMoney(total) + '</td></tr>';
+  html += '</tbody></table></body></html>';
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function() { win.print(); }, 500);
+}
+
+function exportReportPDF() {
+  var val = document.getElementById('rptBoat').value;
+  var boats = val === 'all' ? db.boats.filter(function(b) { return b.active; }) : db.boats.filter(function(b) { return b.id === parseInt(val); });
+  var win = window.open('', '_blank');
+  var rows = boats.map(function(b) {
+    var bal = getBalance(b.id);
+    return '<tr><td>' + b.name + '</td><td>' + b.owner + '</td><td>' + formatMoney(bal.charged) + '</td><td>' + formatMoney(bal.paid) + '</td><td>' + formatMoney(Math.abs(bal.remaining)) + (bal.remaining<0?' (مقدم)':'') + '</td></tr>';
+  }).join('');
+  var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body{font-family:Tahoma,sans-serif;padding:20px;direction:rtl}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px;text-align:right}th{background:#1a3a5c;color:#fff}</style></head><body><h2>تقرير المراكب</h2><table><thead><th>المركب</th><th>المالك</th><th>المستحق</th><th>المسدد</th><th>الرصيد</th></thead><tbody>' + rows + '</tbody></table></body></html>';
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function() { win.print(); }, 500);
+}
+
+function exportReportExcel() {
+  var val = document.getElementById('rptBoat').value;
+  var boats = val === 'all' ? db.boats.filter(function(b) { return b.active; }) : db.boats.filter(function(b) { return b.id === parseInt(val); });
+  var rows = boats.map(function(b) {
+    var bal = getBalance(b.id);
+    return [b.name, b.owner, bal.charged, bal.paid, Math.abs(bal.remaining)].join(',');
+  }).join('\n');
+  var csv = 'المركب,المالك,المستحق,المسدد,الرصيد\n' + rows;
+  var blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8;'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'report.csv';
+  a.click();
+  toast('تم التصدير');
+}
+
+function exportStatementPDF() {
+  var id = parseInt(document.getElementById('stmtBoat').value);
+  if (!id) { toast('اختر مركباً'); return; }
+  var b = db.boats.find(function(x) { return x.id === id; });
+  var txs = db.transactions.filter(function(t) { return t.boatId === id; }).sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+  var win = window.open('', '_blank');
+  var rows = '';
+  var run = 0;
+  txs.forEach(function(t) {
+    run = run + (t.type === 'charge' ? t.amount : -t.amount);
+    rows += '<tr><td>' + formatDate(t.date) + '</td><td>' + t.desc + '</td><td>' + (t.type==='charge'?formatMoney(t.amount):'-') + '</td><td>' + (t.type==='payment'?formatMoney(t.amount):'-') + '</td><td>' + formatMoney(run) + '</td></tr>';
+  });
+  var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>كشف حساب</title><style>body{font-family:Tahoma,sans-serif;padding:20px;direction:rtl}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px;text-align:right}th{background:#1a3a5c;color:#fff}</style></head><body><h2>كشف حساب: ' + b.name + '</h2><p>المالك: ' + b.owner + '</p><table><thead><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th><th>الرصيد</th></thead><tbody>' + rows + '</tbody></table></body></html>';
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function() { win.print(); }, 500);
+}
+
+function exportStatementExcel() {
+  var id = parseInt(document.getElementById('stmtBoat').value);
+  if (!id) { toast('اختر مركباً'); return; }
+  var b = db.boats.find(function(x) { return x.id === id; });
+  var txs = db.transactions.filter(function(t) { return t.boatId === id; }).sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+  var rows = '';
+  var run = 0;
+  txs.forEach(function(t) {
+    run = run + (t.type === 'charge' ? t.amount : -t.amount);
+    rows += [t.date, t.desc, t.type==='charge'?t.amount:'', t.type==='payment'?t.amount:'', run].join(',') + '\n';
+  });
+  var csv = 'التاريخ,البيان,مدين,دائن,الرصيد\n' + rows;
+  var blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8;'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = b.name + '_statement.csv';
+  a.click();
+  toast('تم التصدير');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// بدء التطبيق
+renderAdmin();
+</script>
+</body>
+</html>
